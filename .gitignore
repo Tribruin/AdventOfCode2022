@@ -127,5 +127,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-Day6/Day6-Input.txt
-Day*/Day*-Input.txt
+
