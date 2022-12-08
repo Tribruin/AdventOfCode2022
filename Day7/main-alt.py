@@ -1,3 +1,4 @@
+
 #!/Users/rblount/.pyenv/versions/AdOfCode/bin/python
 
 
@@ -18,6 +19,7 @@ class Directory:
         self.name = dirName
         self.subDirectories = list()
         self.files = dict()
+        self.size = 0
         if parentDir != None:
             self.parentDir = parentDir
             self.parentDir.add_subdirectory(self)
@@ -31,26 +33,26 @@ class Directory:
         self.subDirectories.append(subDirectory)
 
     def folder_size(self) -> int:
+
+        # Check is we already computed the size and return it.
+        # No need to do more work
+        if self.size != 0:
+            return self.size
+
+        # Ok, let's compute the size
         size = 0
         size += sum([x for x in self.files.values()])
         for dir in self.subDirectories:
             size += dir.folder_size()
+
+        # Set the self.size for future use
+        self.size = size
         return size
 
 
 def parse_input(code_input):
     result = code_input.read_lines()
     return result
-
-
-def print_directory_struct(dir: Directory, level=0):
-    print("  " * level, end="")
-    print(f"- {BLUE}{dir.name.split('/')[-2]} (dir) - (size = {dir.folder_size()}{ENDCOLOR}")
-    for subdirectory in dir.subDirectories:
-        print_directory_struct(subdirectory, level + 1)
-    for name, size in dir.files.items():
-        print("  " * (level + 1), end="")
-        print(f"- {RED}{name} (file, size = {size}){ENDCOLOR}")
 
 
 def part1(commands):
@@ -65,41 +67,36 @@ def part1(commands):
     while cmd_no < total_cmds:
         subCommands = commands[cmd_no].split()
         if subCommands[0] == "$":
-            if subCommands[1] == "ls":
-                cmd_no += 1
-                subCommands = commands[cmd_no].split()
-                while subCommands[0] != "$":
-                    if subCommands[0] == "dir":
-                        dirName = subCommands[1]
-                        newPathName = "".join(currentPath) + f"{dirName}/"
-                        directories[newPathName] = Directory(newPathName, currentDir)
-                    else:
-                        size, fileName = int(subCommands[0]), subCommands[1]
-                        currentDir.add_file(fileName, size)
-                    cmd_no += 1
-                    if cmd_no == total_cmds:
-                        break
-                    else:
-                        subCommands = commands[cmd_no].split()
-            elif subCommands[1] == "cd":
-                if subCommands[2] == "..":
-                    currentDir = currentDir.parentDir
-                    currentPath.pop()
-                else:
-                    currentPath.append(f"{subCommands[2]}/")
-                    currentPathName = "".join(currentPath)
-                    currentDir = directories[currentPathName]
-                cmd_no += 1
-                subCommands = commands[cmd_no].split()
+            cmd = subCommands[1]
+        else:
+            cmd = subCommands[0]
+
+        if cmd == "ls":
+            pass
+        elif cmd == "cd":
+            if subCommands[2] == "..":
+                currentDir = currentDir.parentDir
+                currentPath.pop()
+            else:
+                currentPath.append(f"{subCommands[2]}/")
+                currentPathName = "".join(currentPath)
+                currentDir = directories[currentPathName]
+        elif cmd == "dir":
+            dirName = subCommands[1]
+            newPathName = "".join(currentPath) + f"{dirName}/"
+            directories[newPathName] = Directory(newPathName, currentDir)
+
+        else:
+            size, fileName = int(subCommands[0]), subCommands[1]
+            currentDir.add_file(fileName, size)
+        cmd_no += 1
 
     total_size = 0
     for name, directory in directories.items():
         size = directory.folder_size()
         if size <= maxDirSize:
-            # print(f"Directory {name} : {size}")
             total_size += size
     print(total_size)
-    # print_directory_struct(directories["/"])
 
     return directories
 
