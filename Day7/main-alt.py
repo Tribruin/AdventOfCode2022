@@ -67,25 +67,22 @@ def part1(commands):
     while cmd_no < total_cmds:
         subCommands = commands[cmd_no].split()
         if subCommands[0] == "$":
-            cmd = subCommands[1]
-        else:
-            cmd = subCommands[0]
+            subCommands = subCommands[1:]
 
-        if cmd == "ls":
-            pass
-        elif cmd == "cd":
-            if subCommands[2] == "..":
+        if subCommands[0] == "cd":
+            if subCommands[1] == "..":
                 currentDir = currentDir.parentDir
                 currentPath.pop()
             else:
-                currentPath.append(f"{subCommands[2]}/")
+                dirName = subCommands[1]
+                newPathName = "".join(currentPath) + f"{dirName}/"
+                directories[newPathName] = Directory(newPathName, currentDir)
+                currentPath.append(f"{subCommands[1]}/")
                 currentPathName = "".join(currentPath)
                 currentDir = directories[currentPathName]
-        elif cmd == "dir":
-            dirName = subCommands[1]
-            newPathName = "".join(currentPath) + f"{dirName}/"
-            directories[newPathName] = Directory(newPathName, currentDir)
-
+        elif subCommands[0] == "ls" or subCommands[0] == "dir":
+            # Ignoring these commands as they don't add anything
+            pass
         else:
             size, fileName = int(subCommands[0]), subCommands[1]
             currentDir.add_file(fileName, size)
