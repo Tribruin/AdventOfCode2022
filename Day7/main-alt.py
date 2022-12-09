@@ -89,7 +89,7 @@ def part1(commands):
         cmd_no += 1
 
     total_size = 0
-    for name, directory in directories.items():
+    for directory in directories.values():
         size = directory.folder_size()
         if size <= maxDirSize:
             total_size += size
@@ -102,12 +102,12 @@ def part2(directories: list):
     usedSpace = directories["/"].folder_size()
     avaliableSpace = totalDiskSize - usedSpace
     minNeedToDelete = sizeRequired - avaliableSpace
-    maxNeedToDelete = usedSpace
+    maxNeedToDelete = totalDiskSize
     dirToDelete = None
-    for dir in directories.values():
-        size = dir.folder_size()
+    for directory in directories.values():
+        size = directory.folder_size()
         if (size > minNeedToDelete) and (maxNeedToDelete):
-            dirToDelete = dir
+            dirToDelete = directory
     print(f"{dirToDelete.name} = {dirToDelete.folder_size()}")
 
 
