@@ -1,7 +1,6 @@
 import sys
 import os
 import time
-import numpy as np
 from AOC import AOC
 from TerminalColors import *
 
@@ -27,27 +26,6 @@ def sign(x) -> int:
         return (x // abs(x))
 
 
-def print_board(board: np.array, knot_pos: list, start_pos: tuple):
-    x, y = board.shape
-    print(f"{CLEAR}")
-    for y_pos in range(y):
-        for x_pos in range(x):
-            if (x_pos, y_pos) in knot_pos:
-                knot_no = str(knot_pos.index((x_pos, y_pos)))
-                if knot_no == "0":
-                    knot_no = f"{BRED}H"
-                print(f"{BYELLOW}{knot_no}{ENDCOLOR}", end="")
-            elif (x_pos, y_pos) == start_pos:
-                print(f"{GREEN}s{ENDCOLOR}", end="")
-            elif board[(x_pos, y_pos)]:
-                print(f"{WHITE}#{ENDCOLOR}", end="")
-            else:
-                print(f"{CYAN}.{ENDCOLOR}", end="")
-        print()
-    print()
-    time.sleep(0.25)
-
-
 def move_tail(head_pos, tail_pos) -> tuple:
     # Return the move vector for the tail based on the head position
 
@@ -69,10 +47,10 @@ def move_tail(head_pos, tail_pos) -> tuple:
 def part1(moves):
 
     # Create a board to track the tail visits
-    board = np.zeros((size, size), dtype=bool)
+    visited = list()
     x = y = size // 2
     head = tail = (x, y)
-    board[tail] = True
+    visited.append(tail)
 
     for move in moves:
         move_dir, steps = move
@@ -80,23 +58,21 @@ def part1(moves):
             head = add_tuples(head, move_dict[move_dir])
             tail_move = move_tail(head, tail)
             tail = add_tuples(tail, tail_move)
-            board[tail] = True
-    print(np.sum(board))
+            visited.append(tail)
+    print(len(set(visited)))
 
 
 def part2(moves):
 
     # Create a board to track the tail visits
-    board = np.zeros((size, size), dtype=bool)
     x = y = size // 2
+    visited = list()
 
     # Create a list of knots 0-9 where 0 is HEAD and 9 is TAIL
     knots = [(x, y) for i in range(10)]
-    board[knots[9]] = True
-    # print_board(board, knots, start)
+    visited.append(knots[9])
 
     for move_dir, steps in moves:
-        # move_dir, steps = move
         for _ in range(steps):
             # First move the HEAD
             knots[0] = add_tuples(knots[0], move_dict[move_dir])
@@ -107,10 +83,10 @@ def part2(moves):
                 knots[i] = add_tuples(knots[i], tail_move)
 
             # Mark the position of the last knot as visited.
-            board[knots[9]] = True
+            visited.append(knots[9])
 
         # print_board(board, knots, start)
-    print(np.sum(board))
+    print(len(set(visited)))
 
 
 def main():
