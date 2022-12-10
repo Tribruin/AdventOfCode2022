@@ -18,8 +18,16 @@ def parse_input(code_input):
     return result
 
 
-def add_tuple(a, b) -> tuple:
+def add_tuples(a, b) -> tuple:
     return (a[0] + b[0], a[1] + b[1])
+
+
+def sign(x) -> int:
+    # Returns the sign of the X (-1, 0, 1)
+    if x == 0:
+        return 0
+    else:
+        return (x // abs(x))
 
 
 def print_board(board: np.array, knot_pos: list, start_pos: tuple):
@@ -44,58 +52,66 @@ def print_board(board: np.array, knot_pos: list, start_pos: tuple):
 
 
 def move_tail(head_pos, tail_pos) -> tuple:
+    # Return the move vector for the tail based on the head position
+
     head_x, head_y = head_pos
     tail_x, tail_y = tail_pos
 
     # check if the tail is within one position of the head and return a (0,0)
     if ((abs(head_x - tail_x)) <= 1) and (abs(head_y - tail_y) <= 1):
         return (0, 0)
-    if head_y == tail_y:
-        x_move = (head_x - tail_x) // abs(head_x - tail_x)
-        return (x_move, 0)
-    elif head_x == tail_x:
-        y_move = (head_y - tail_y) // abs(head_y - tail_y)
-        return (0, y_move)
-    else:
-        x_move = (head_x - tail_x) // abs(head_x - tail_x)
-        y_move = (head_y - tail_y) // abs(head_y - tail_y)
-        return(x_move, y_move)
-    return (0, 0)
+
+    # Else we are goign to return a vector that equals the signs of movement
+    # Yes, it works. For example if the HEAD is (5,5) and TAIL is (3,3)
+    # The move vector is (1,1) to move TAIL to (4,4)
+    # Note this only works if the TAIL moves every time the HEAD moves.
+
+    return (sign(head_x-tail_x), sign(head_y - tail_y))
 
 
 def part1(moves):
+
+    # Create a board to track the tail visits
     board = np.zeros((size, size), dtype=bool)
     x = y = size // 2
-    head = (x, y)
-    tail = (x, y)
+    head = tail = (x, y)
     board[tail] = True
 
     for move in moves:
         move_dir, steps = move
-        for step in range(steps):
-            head = add_tuple(head, move_dict[move_dir])
+        for _ in range(steps):
+            head = add_tuples(head, move_dict[move_dir])
             tail_move = move_tail(head, tail)
-            tail = add_tuple(tail, tail_move)
+            tail = add_tuples(tail, tail_move)
             board[tail] = True
     print(np.sum(board))
 
 
 def part2(moves):
+
+    # Create a board to track the tail visits
     board = np.zeros((size, size), dtype=bool)
     x = y = size // 2
-    start = (x, y)
+
+    # Create a list of knots 0-9 where 0 is HEAD and 9 is TAIL
     knots = [(x, y) for i in range(10)]
-    board[knots[0]] = True
+    board[knots[9]] = True
     # print_board(board, knots, start)
 
-    for move in moves:
-        move_dir, steps = move
-        for step in range(steps):
-            knots[0] = add_tuple(knots[0], move_dict[move_dir])
+    for move_dir, steps in moves:
+        # move_dir, steps = move
+        for _ in range(steps):
+            # First move the HEAD
+            knots[0] = add_tuples(knots[0], move_dict[move_dir])
+
             for i in range(1, 10):
+                # Now move each knot using the new position of the previous knot
                 tail_move = move_tail(knots[i-1], knots[i])
-                knots[i] = add_tuple(knots[i], tail_move)
+                knots[i] = add_tuples(knots[i], tail_move)
+
+            # Mark the position of the last knot as visited.
             board[knots[9]] = True
+
         # print_board(board, knots, start)
     print(np.sum(board))
 
@@ -113,7 +129,7 @@ def main():
     code_input = AOC(codeDate, codeYear, test=testing)
     data_input = parse_input(code_input)
 
-    # part1(data_input)
+    part1(data_input)
     part2(data_input)
 
 
