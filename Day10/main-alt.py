@@ -1,5 +1,6 @@
 import sys
 import os
+from time import sleep
 from AOC import AOC
 from TerminalColors import *
 
@@ -13,8 +14,43 @@ def parse_input(code_input):
     return result
 
 
-def printScreenInter(screen, cycle, sprit_pos):
+def printScreenInter(screen, cycle, sprite_pos):
     print(f"{CLEAR}")
+    chars = [" ", f"{BLUE}█{ENDCOLOR}", f"{GREEN}░{ENDCOLOR}", f"{RED}█{ENDCOLOR}", f"{YELLOW}█{ENDCOLOR}"]
+
+    if sprite_pos == 1:
+        sprite_range = [0, 1]
+    elif sprite_pos == 40:
+        sprite_range = [39, 40]
+    else:
+        sprite_range = list(range(sprite_pos-1, sprite_pos+2))
+
+    for x in range(0, 40):
+        if (x in sprite_range):
+            if (x % 40 == (cycle - 1) % 40):
+                print(chars[3], end="")
+            else:
+                print(chars[2], end="")
+        else:
+            print(chars[0], end="")
+    print()
+
+    for x in range(0, 241):
+        line = 0
+
+        if x == (cycle - 1):
+            print(chars[4], end="")
+
+        elif x <= cycle - 1:
+            print(chars[screen[x]], end="")
+        else:
+            print(chars[0], end="")
+        if ((x + 1) % 40) == 0:
+            line += 1
+            print()
+    print()
+    print(f"Cycle: {cycle} - Sprite Range: {min(sprite_range)}:{max(sprite_range)}")
+    sleep(0.15)
 
 
 def printScreen(screen, cycle):
@@ -56,11 +92,13 @@ def part2(commands):
             case ['noop']:
                 if sprit_pos - 1 <= (cycle - 1) % 40 <= sprit_pos + 1:
                     screen[cycle-1] = True
+                printScreenInter(screen, cycle, sprit_pos)
                 cycle += 1
             case ['addx', val]:
                 for _ in range(2):
                     if sprit_pos - 1 <= (cycle - 1) % 40 <= sprit_pos + 1:
                         screen[cycle-1] = True
+                    printScreenInter(screen, cycle, sprit_pos)
                     cycle += 1
                 regX += int(val)
         sprit_pos = regX
@@ -80,7 +118,7 @@ def main():
     code_input = AOC(codeDate, codeYear, test=testing)
     data_input = parse_input(code_input)
 
-    part1(data_input)
+    # part1(data_input)
     part2(data_input)
 
 
