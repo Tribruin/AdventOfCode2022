@@ -1,14 +1,10 @@
 import sys
 import os
 import numpy as np
-from AOC import AOC
+from AOC import AOC, addTuples
 from TerminalColors import *
 
-testing = False
-
-
-def addTuple(a, b) -> tuple:
-    return (a[0]+b[0], a[1] + b[1])
+testing = True
 
 
 class Graph():
@@ -39,7 +35,7 @@ class Graph():
             for x in range(self.mapSize[0]):
                 self.heightMap[(x, y)]['edges'] = list()
                 for move in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    edge = addTuple(move, (x, y))
+                    edge = addTuples(move, (x, y))
                     if (0 <= edge[0] < self.mapSize[0]) and (0 <= edge[1] <= self.mapSize[1] - 1):
                         if ord(self.heightMap[(x, y)]['height']) + 1 >= ord(self.heightMap[edge]['height']):
                             self.heightMap[(x, y)]['edges'].append(edge)
@@ -83,8 +79,6 @@ def part1(graphMap):
         visited.append(currentPoint)
         unvisited.pop(unvisited.index(currentPoint))
     print(graphMap.heightMap[graphMap.endPos]['dist'])
-    pointsNotChecked = [x]
-    pass
 
 
 def part2(graphMap):
@@ -142,8 +136,8 @@ def main():
     # global data
     code_input = AOC(codeDate, codeYear, test=testing)
 
-    # data_input = parse_input(code_input)
-    # part1(data_input)
+    data_input = parse_input(code_input)
+    part1(data_input)
 
     data_input = parse_input(code_input)
     part2(data_input)

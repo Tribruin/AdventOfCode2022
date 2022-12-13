@@ -2,7 +2,7 @@ import sys
 import os
 import time
 import numpy as np
-from AOC import AOC
+from AOC import AOC, addTuple
 from TerminalColors import *
 
 testing = False
@@ -13,10 +13,6 @@ move_dict = {"U": (0, -1), "D": (0, 1), "L": (-1, 0), "R": (1, 0)}
 def parse_input(code_input):
     result = [(x, int(y)) for x, y in code_input.split_lines(" ")]
     return result
-
-
-def add_tuples(a, b) -> tuple:
-    return (a[0] + b[0], a[1] + b[1])
 
 
 def sign(x) -> int:
@@ -77,9 +73,9 @@ def part1(moves):
     for move in moves:
         move_dir, steps = move
         for _ in range(steps):
-            head = add_tuples(head, move_dict[move_dir])
+            head = addTuple(head, move_dict[move_dir])
             tail_move = move_tail(head, tail)
-            tail = add_tuples(tail, tail_move)
+            tail = addTuple(tail, tail_move)
             board[tail] = True
     print(np.sum(board))
 
@@ -99,12 +95,12 @@ def part2(moves):
         # move_dir, steps = move
         for _ in range(steps):
             # First move the HEAD
-            knots[0] = add_tuples(knots[0], move_dict[move_dir])
+            knots[0] = addTuple(knots[0], move_dict[move_dir])
 
             for i in range(1, 10):
                 # Now move each knot using the new position of the previous knot
                 tail_move = move_tail(knots[i-1], knots[i])
-                knots[i] = add_tuples(knots[i], tail_move)
+                knots[i] = addTuple(knots[i], tail_move)
 
             # Mark the position of the last knot as visited.
             board[knots[9]] = True
